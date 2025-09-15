@@ -1,5 +1,5 @@
 const express = require("express");
-const fs = require("fs").promises; // Usa a versão de promises do fs
+const fs = require("fs").promises; 
 const path = require("path");
 const { v4: uuidv4 } = require('uuid');
 const app = express();
@@ -13,26 +13,22 @@ app.use((req, res, next) => {
 
 const DB_FILE = path.join(__dirname, "tickets.json");
 
-// Função assíncrona para ler o banco de dados
 async function readDb() {
   try {
     const txt = await fs.readFile(DB_FILE, "utf8");
     return JSON.parse(txt);
   } catch (error) {
     if (error.code === 'ENOENT') {
-      // Se o arquivo não existir, retorna um array vazio
       return [];
     }
     throw error;
   }
 }
 
-// Função assíncrona para escrever no banco de dados
 async function writeDb(data) {
   await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2));
 }
 
-// Rotas do Express ajustadas para serem assíncronas
 app.get("/tickets", async (req, res) => {
   try {
     let list = await readDb();
@@ -41,7 +37,8 @@ app.get("/tickets", async (req, res) => {
       const filterKey = req.query.filter;
       list = list.filter((t) => t[filterKey]);
     }
-
+    
+    // O laço de lentidão foi removido daqui
     res.json(list);
   } catch (error) {
     res.status(500).send("Erro ao ler o banco de dados");
